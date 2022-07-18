@@ -33,6 +33,9 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "file-loader": "^6.2.0",
+    "next-compose-plugins": "^2.2.1",
+    "next-plugin-svgr": "^1.1.1",
     "prettier": "2.7.1",
     "typescript": "4.7.4"
   }
