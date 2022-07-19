@@ -1,13 +1,25 @@
-# Next.js initial setting
+[[_TOC_]]
 
-> Next.js 프로젝트를 시작할 때 환경을 어떻게 구축했는지에 대한 설명입니다.
+## 프로젝트 환경 설정
+
+---
+
+- node: 16.16.0
+- Next.js (React 프레임워크)
+- coreui + styled-components
+- axios + react-query
+- 데이터 그리드 : AG Grid [(링크)](https://www.ag-grid.com/)
+
+---
 
 <br />
+
+> 아래 내용은 해당 프로젝트의 환경을 어떻게 구축했는지에 대한 설명입니다.
 
 ## 1. Next.js 프로젝트 생성
 
 ```bash
-npx create-next-app --typescript nextjs-initial-setting
+npx create-next-app --typescript t3q.dl_ul_react
 ```
 
 <br />
@@ -20,11 +32,11 @@ npx eslint --init
 
 `.eslint.json`이 생성됩니다.
 
-<br />
-
-eslint 추가 설정 및 prettier 추가
 ```bash
+/** eslint 추가 설정 */
 npm install --save-dev eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react-hooks
+
+/** prettier */
 npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugin-prettier
 ```
 
@@ -32,19 +44,20 @@ npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugi
 
 ```json
 /** .eslintrc.json */
-
 {
   ...
   "extends": [
     ...
+    /** 추가 */
     "prettier"
   ],
   "plugins": [
     ...
+    /** 추가 */
     "react-hooks",
     "pretter"
   ],
-  
+  /** 추가 */
   "rules": {
     "react/react-in-jsx-scope": "off",
     "camelcase": "error",
@@ -67,9 +80,8 @@ npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugi
 }
 ```
 
-```rc
+```json
 /** .prettierrc */
-
 {
   "semi": false,
   "tabWidth": 2,
@@ -300,24 +312,24 @@ module.exports = { svgrOptions, fileLoaderOptions }
 npx mrm@2 lint-staged
 ```
 
-`packge.json`을 수정합니다.
+`.husky` > `pre-commit`에서 `npx lint-staged`을 `npm run lint` 수정합니다.
 
-```json
+```sh
+...
+
+npm run lint
+```
+
+그리고 `lint-staged`에서 Eslint warning이 발견 될 경우 git commit이 중단되게 하길 원한다면 아래와 같이 수정하면 됩니다.
+
+```
+/** package.json */
 {
   ...
-  "scripts": {
+  "scripts: {
     ...
-    "lint:fix": "eslint --fix '**/*.{js,jsx,ts,tsx}'",
-    "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
-  },
-  ...
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,css,md,json}": [
-      "prettier --write --config ./.prettierrc"
-    ],
-    "**/*.{js,jsx,ts,tsx}": [
-      "next lint"
-    ]
+    "lint": "next lint --max-warnings 0",
+    ...
   }
 }
 ```
