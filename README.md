@@ -1,8 +1,8 @@
 # Next.js initial setting
 
-[[_TOC_]]
+> Next.js 프로젝트를 시작할 때 환경을 어떻게 구축했는지에 대한 설명입니다.
 
-Next.js 프로젝트를 시작할 때 환경을 어떻게 구축했는지에 대한 설명입니다.
+<br />
 
 ## 1. Next.js 프로젝트 생성
 
