@@ -1,34 +1,323 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js initial setting
 
-## Getting Started
+[[_TOC_]]
 
-First, run the development server:
+Next.js 프로젝트를 시작할 때 환경을 어떻게 구축했는지에 대한 설명입니다.
+
+## 1. Next.js 프로젝트 생성
 
 ```bash
-npm run dev
-# or
-yarn dev
+npx create-next-app --typescript nextjs-initial-setting
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<br />
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 2. eslint, prettier 셋팅
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+npx eslint --init
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+`.eslint.json`이 생성됩니다.
 
-## Learn More
+<br />
 
-To learn more about Next.js, take a look at the following resources:
+eslint 추가 설정 및 prettier 추가
+```bash
+npm install --save-dev eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react-hooks
+npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugin-prettier
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`.eslint.json`을 아래와 같이 수정하고 `.perttierrc`를 추가합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```json
+/** .eslintrc.json */
 
-## Deploy on Vercel
+{
+  ...
+  "extends": [
+    ...
+    "prettier"
+  ],
+  "plugins": [
+    ...
+    "react-hooks",
+    "pretter"
+  ],
+  
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "camelcase": "error",
+    "spaced-comment": "error",
+    "quotes": ["error", "single"],
+    "no-duplicate-imports": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"]
+      }
+    },
+    "react": {
+      "version": "detect"
+    }
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```rc
+/** .prettierrc */
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+{
+  "semi": false,
+  "tabWidth": 2,
+  "printWidth": 100,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "jsxSingleQuote": true,
+  "bracketSpacing": true
+}
+```
+
+<br />
+
+## 3. Absolute path 설정
+
+`tsconfig.json`의 설정 중에 `baseUrl`과 `paths` 설정으로 절대경로 설정이 가능합니다.
+
+```tsx
+{
+  ...
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./*"]
+  },
+  ...
+}
+```
+
+<br />
+
+## 4. Styled-components 적용
+
+```bash
+npm i styled-components styled-normalize
+npm i -D @types/styled-components
+```
+
+- styled-components
+- styled-normalize → css 초기화에 사용되는 라이브러리
+- typescript를 적용 시 styled-components를 인식하지 못하기 때문에 type이 정의되어있는 라이브러리도 같이 설치해줍니다.
+
+- global-style.ts → 전역 스타일을 설정하는 부분 (예시 ⤵️)
+
+  ```tsx
+  import { createGlobalStyle } from 'styled-components'
+  import { normalize } from 'styled-normalize'
+
+  export const GlobalStyle = createGlobalStyle`
+  	${normalize}
+  	
+  	html {
+  		box-sizing: border-box;
+  		font-size: 10px;
+  	}
+  `
+  ```
+
+- styled.d.ts → theme.ts에서 사용되는 변수들의 타입
+
+  ```tsx
+  import 'styled-components'
+
+  declare module 'styled-components' {
+    // theme에서 사용할 변수들의 타입을 지정해준다.
+    export interface DefaultTheme {}
+  }
+  ```
+
+- theme.ts → 공통으로 사용되는 theme 스타일 지정
+
+  ```tsx
+  import { DefaultTheme } from 'styled-components'
+
+  export const theme: DefaultTheme = {}
+  ```
+
+위에서 설정한 스타일과 theme을 App 적용해야합니다.
+
+`/pages/_app.tsx` 내에 전역 스타일과 테마로 감싸준 코드를 추가합니다.
+
+```tsx
+import type { AppProps } from 'next/app'
+import { ThemeProvider } from 'styled-components'
+
+import { GlobalStyle } from '../styles/global-style'
+import { theme } from '../styles/theme'
+
+function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <Component {...pageProps} />
+      </ThemeProvider>
+    </>
+  )
+}
+
+export default App
+```
+
+`.babelrc` 를 추가하지 않으면 스타일이 적용되기 전에 렌더링 되는 현상이 발생합니다.
+
+```tsx
+npm install --save-dev babel-plugin-styled-components
+```
+
+최상위 디렉토리에 `.babelrc` 를 추가해줍니다.
+
+```tsx
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "styled-components",
+      { "ssr": true, "displayName": true, "preprocess": false }
+    ]
+  ]
+}
+```
+
+next.js에서 styled-components를 사용하면 css 적용이 바로 안되고 늦게 되서 깜빡이는 현상이 발생합니다. 따라서 `_document.tsx` 파일을 생성해서 렌더링 될때 styled-components의 css를 적용해줘야 합니다.
+
+```tsx
+import Document, { DocumentContext } from 'next/document'
+import { ServerStyleSheet } from 'styled-components'
+
+export default class MyDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext) {
+    const sheet = new ServerStyleSheet()
+    const originalRenderPage = ctx.renderPage
+
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
+        })
+
+      const initialProps = await Document.getInitialProps(ctx)
+      return {
+        ...initialProps,
+        styles: [initialProps.styles, sheet.getStyleElement()],
+      }
+    } finally {
+      sheet.seal()
+    }
+  }
+}
+```
+
+<br />
+
+## 5. svgr 셋팅
+
+SVGR은 svg 파일을 React 컴포넌트로 사용할 수 있도록 만들어주는 도구입니다.
+
+next.js 용 플러그인을 설치합니다.
+
+```bash
+npm i -D next-compose-plugins next-plugin-svgr file-loader
+```
+
+자세한 설정 내용은 다음을 참고하세요. ([참고](https://github.com/platypusrex/next-plugin-svgr#usage))
+
+```js
+/** next.config.js */
+/** @type {import('next').NextConfig} */
+
+const withPlugins = require('next-compose-plugins')
+const withSvgr = require('next-plugin-svgr')
+const { svgrOptions, fileLoaderOptions } = require('./.svgrrc')
+
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+}
+
+module.exports = withPlugins(
+  [
+    withSvgr({
+      fileLoader: fileLoaderOptions,
+      svgrOptions,
+    }),
+  ],
+  nextConfig,
+)
+```
+
+```js
+/** .svgrc.js */
+const svgrOptions = {
+  titleProp: true,
+  icon: true,
+  svgProps: {
+    height: 'auto',
+  },
+  memo: true,
+  jsxImportSource: {
+    source: '@emotion/react',
+    specifiers: ['jsx'],
+  },
+}
+
+const fileLoaderOptions = {
+  limit: 16384,
+  name(resourcePath, resourceQuery) {
+    if (process.env.NODE_ENV === 'development') {
+      return '[path][name].[ext]'
+    }
+    return '[contenthash].[ext]'
+  },
+}
+
+module.exports = { svgrOptions, fileLoaderOptions }
+```
+
+<br />
+
+## 6. husky, lint-staged 셋팅
+
+```bash
+npx mrm@2 lint-staged
+```
+
+`packge.json`을 수정합니다.
+
+```json
+{
+  ...
+  "scripts": {
+    ...
+    "lint:fix": "eslint --fix '**/*.{js,jsx,ts,tsx}'",
+    "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+  },
+  ...
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,css,md,json}": [
+      "prettier --write --config ./.prettierrc"
+    ],
+    "**/*.{js,jsx,ts,tsx}": [
+      "next lint"
+    ]
+  }
+}
+```
