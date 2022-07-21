@@ -1,16 +1,18 @@
-[[_TOC_]]
+# 목차
 
-## 프로젝트 환경 설정
+1. [Nextjs 프로젝트 생성](#1-nextjs-프로젝트-생성)
 
----
+2. [eslint, prettier 셋팅](#2-eslint-prettier-셋팅)
 
-- node: 16.16.0
-- Next.js (React 프레임워크)
-- coreui + styled-components
-- axios + react-query
-- 데이터 그리드 : AG Grid [(링크)](https://www.ag-grid.com/)
+3. [Absolute path 설정](#3-absolute-path-설정)
 
----
+4. [Styled-components 적용](#4-styled-components-적용)
+
+5. [svgr 셋팅](#5-svgr-셋팅)
+
+6. [husky, lint-staged 셋팅](#6-husky-lint-staged-셋팅)
+------
+
 
 <br />
 
