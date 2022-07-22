@@ -314,24 +314,19 @@ module.exports = { svgrOptions, fileLoaderOptions }
 npx mrm@2 lint-staged
 ```
 
-`.husky` > `pre-commit`에서 `npx lint-staged`을 `npm run lint` 수정합니다.
+`package.json`에 `lint-staged`에 단계에서 수행할 목록에 대해서 정의해줍니다.
 
-```sh
-...
-
-npm run lint
-```
-
-그리고 `lint-staged`에서 Eslint warning이 발견 될 경우 git commit이 중단되게 하길 원한다면 아래와 같이 수정하면 됩니다.
-
-```
+```json
 /** package.json */
+
 {
   ...
-  "scripts: {
-    ...
-    "lint": "next lint --max-warnings 0",
-    ...
+  "lint-staged": {
+    "**/.{jsx, js, tsx, ts}": [
+    "eslint --fix --max-warnings 0",
+    ]
   }
 }
 ```
+
+`--max-warnings 0`은 eslint 실행이 waring의 개수가 0개여야 통과가 된다라는 뜻입니다.
