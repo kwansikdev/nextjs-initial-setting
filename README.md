@@ -234,7 +234,10 @@ export default class MyDocument extends Document {
 }
 ```
 
+<br />
+
 - next.js 12버전부터 swc 컴파일러 설정이 CNA로 프로젝트 생성 시 default로 true가 됩니다. 이에 따라 styled-components 설정이 기존 위에서 설정한 내용보다 훨씬 간단하게 적용이 됩니다.
+
 
 <br />
 
