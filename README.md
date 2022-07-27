@@ -102,11 +102,21 @@ npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugi
 `tsconfig.json`의 설정 중에 `baseUrl`과 `paths` 설정으로 절대경로 설정이 가능합니다.
 
 ```tsx
+// 예시
+
 {
   ...
   "baseUrl": ".",
   "paths": {
-    "@/*": ["./*"]
+    "@components/*": ["src/components/*"],
+    "@hooks/*": ["src/hooks/*"],
+    "@layout/*": ["src/layout/*"],
+    "@libs/*": ["src/libs/*"],
+    "@functions/*": ["src/functions/*"],
+    "@services/*": ["src/services/*"],
+    "@pages/*": ["src/pages/*"],
+    "@types/*": ["src/types/*"],
+    "@utils/*": ["src/utils/*"]
   },
   ...
 }
