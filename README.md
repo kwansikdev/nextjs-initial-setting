@@ -251,6 +251,33 @@ export default class MyDocument extends Document {
 
 <br />
 
+next.js를 12버전 이상으로 설치 한 뒤 `next.config.js`를 확인해 보면 아래와 같이 `swcMinify`가 true로 설정되어 있습니다.
+
+```javascript
+// next.config.js
+
+module.exports = {
+  swcMinify: true,
+}
+```
+
+여기에서 `complirt` 옵션에 styled-components에 대한 옵션을 true로 설정해 주면 위에서 ssr을 적용해줬던 부분을 매우 간단하게 적용할 수 있습니다.
+
+```javascript
+// next.config.js
+
+module.exports = {
+  swcMinify: true,
+  
++  complier: {
++  // ssrm displayName true가 기본값으로 켜진다.
++    styledComponents: true
++  }
+}
+```
+
+<br />
+
 ## 5. svgr 셋팅
 
 SVGR은 svg 파일을 React 컴포넌트로 사용할 수 있도록 만들어주는 도구입니다.
