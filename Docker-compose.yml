@@ -1,0 +1,28 @@
+services:
+  nextjs:
+    container_name: nextjs
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+
+  storybook:
+    container_name: storybook
+    build:
+      context: .
+      dockerfile: Dockerfile.storybook
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - '6006:6006'
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
