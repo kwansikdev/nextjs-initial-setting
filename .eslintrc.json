@@ -8,7 +8,8 @@
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "prettier",
+    "plugin:storybook/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -20,6 +21,7 @@
   },
   "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier"],
   "rules": {
+    "no-import-assign": "off",
     "react/react-in-jsx-scope": "off",
     "camelcase": "error",
     "spaced-comment": "off",
@@ -38,5 +40,6 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "ignorePatterns": ["!.*"]
 }
