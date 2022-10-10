@@ -372,3 +372,94 @@ npx mrm@2 lint-staged
 ```
 
 `--max-warnings 0`은 eslint 실행이 waring의 개수가 0개여야 통과가 된다라는 뜻입니다.
+
+---
+## 7. 번외
+번외에서는 꼭 필요한 설정은 아니지만 해두면 협업할 때 편할 수 있는 내용들을 포함해두려고 합니다.
+
+
+### 7-1. Docker로 환경셋팅 없이 개발하기
+대부분 `javascript`로 개발을 하는 개발자분들(주로 프론트엔드 개발자 또는 node 개발자)은 기본적으로 `node`가 설치되어 있어서 프로젝트를 `clone`한 뒤 자연스럽게 `npm install` 또는 `yarn install`을 사용해 프로젝트를 로컬에서 실행합니다. 
+
+`javascript` 개발자분들을 제외한 다른 언어를 사용하는 분들은 대부분 `node`가 설치 안되어 있을 확률이 높습니다. 프론트엔드와 협업을 하는 팀에서 자신의 컴퓨터에서 UI를 확인하면서 테스트를 해보거나 개발을 하려할 때 `node` 개발환경을 셋팅을 해야하는 수고스러움이 생길 수 있습니다. `README`에 적힌대로 따라서 셋팅을 했다고 하더라도 실행이 안될 수도 있습니다.
+
+또는 외부에서 급하게 확인을 해야하는 경우에도 높은 확률로 `node` 환경이 설치되어 있지 않을 겁니다. 
+
+이러한 경우에 대비해서 `Docker`를 사용해서 개발환경을 설정해두고 `Docker`를 실행하는 것만으로도 바로 확인하고 코드 수정까지 가능하도록 해보려고 합니다.
+
+<br />
+이 프로젝트는 storybook 설정도 포함되어 있으므로 Docker compose를 사용해 보려합니다.
+
+1. Docker compose 작성
+  ```yml
+  services:
+    nextjs:
+      # 컨테이너 이름. Docker가 실행될 때 프로젝트명-${ontainer_name}으로 붙으므로 
+      # container_name에 따로 중복을 피하기 위해 프로젝트명을 넣지 않아도 됩니다.
+      container_name: nextjs 
+      build: # 이미지를 빌드하기 위한 Dockerfile이 위치하는 경로를 지정.
+        # Dockerfile이란 이름이 아닌 다른 이름의 파일로 빌드하고 싶으면 아래와 같이 작성하면 됩니다.
+        context: . # directory 경로.
+        dockerfile: Dockerfile.dev # dockerfile 이름.
+      volumes: # Docker 컨테이너 생명 주기와 상관없이 데이터를 저장하기 위해 사용합니다.
+        - '.:/app'
+        - '/app/node_modules'
+      ports: # 컨테이너의 포트와 호스트를 맵핑.
+        - '3000:3000'
+      environment: # 환경 변수 설정
+        - NODE_ENV=development
+        - CHOKIDAR_USEPOLLING=true # App이 수정되었을 경우 Hot Reloading가 가능하도록 하는 설정입니다.
+
+    storybook:
+      container_name: storybook
+      build:
+        context: .
+        dockerfile: Dockerfile.storybook
+      volumes:
+        - ./:/app
+        - /app/node_modules
+      ports:
+        - '6006:6006'
+      environment:
+        - NODE_ENV=development
+        - CHOKIDAR_USEPOLLING=true
+  ```
+
+  2. dockerfile 작성
+  
+  - nextjs
+
+  ```docker
+    FROM node:16.16
+
+    WORKDIR /app
+
+    ENV PATH /app/node_modules/.bin:$PATH
+
+    COPY package.json /app/package.json
+    RUN npm install --silent
+
+    CMD ["npm", "run", "dev"]
+  ```
+
+  - storybook
+  ```docker
+    FROM node:16.16
+
+    WORKDIR /app
+
+    ENV PATH /app/node_modules/.bin:$PATH
+
+    COPY package.json /app/package.json
+    RUN npm install --silent
+
+    CMD ["npm", "run", "storybook"]
+  ```
+
+  3. docker-compose 명령어로 실행
+
+  ```bash
+  docker-compose up -d --build
+  ```
+
+  
