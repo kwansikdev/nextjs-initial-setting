@@ -57,7 +57,7 @@ npm install --save-dev --save-exact prettier eslint-config-prettier eslint-plugi
     ...
     /** 추가 */
     "react-hooks",
-    "pretter"
+    "prettier"
   ],
   /** 추가 */
   "rules": {
