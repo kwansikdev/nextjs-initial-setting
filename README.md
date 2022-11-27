@@ -285,7 +285,7 @@ SVGR은 svg 파일을 React 컴포넌트로 사용할 수 있도록 만들어주
 next.js 용 플러그인을 설치합니다.
 
 ```bash
-npm i -D next-compose-plugins next-plugin-svgr file-loader
+npm i -D @svgr/webpack file-loader
 ```
 
 자세한 설정 내용은 다음을 참고하세요. ([참고](https://github.com/platypusrex/next-plugin-svgr#usage))
@@ -294,8 +294,6 @@ npm i -D next-compose-plugins next-plugin-svgr file-loader
 /** next.config.js */
 /** @type {import('next').NextConfig} */
 
-const withPlugins = require('next-compose-plugins')
-const withSvgr = require('next-plugin-svgr')
 const { svgrOptions, fileLoaderOptions } = require('./.svgrrc')
 
 const nextConfig = {
@@ -307,17 +305,26 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: svgrOptions,
+        },
+        {
+          loader: 'file-loader',
+          options: svgrFileLoaderOptions,
+        },
+      ],
+    })
+    return config
+  },
 }
 
-module.exports = withPlugins(
-  [
-    withSvgr({
-      fileLoader: fileLoaderOptions,
-      svgrOptions,
-    }),
-  ],
-  nextConfig,
-)
+module.exports = nextConfig
 ```
 
 ```js
@@ -326,27 +333,41 @@ const svgrOptions = {
   titleProp: true,
   icon: true,
   svgProps: {
-    height: 'auto',
+    height: '100%',
   },
   memo: true,
-  jsxImportSource: {
-    source: '@emotion/react',
-    specifiers: ['jsx'],
-  },
-}
+};
 
-const fileLoaderOptions = {
+const svgrFileLoaderOptions = {
   limit: 16384,
   name(resourcePath, resourceQuery) {
     if (process.env.NODE_ENV === 'development') {
-      return '[path][name].[ext]'
+      return '[path][name].[ext]';
     }
-    return '[contenthash].[ext]'
+    return '[contenthash].[ext]';
   },
+};
+
+module.exports = { svgrOptions, svgrFileLoaderOptions };
+```
+
+```typescript
+/** svgr.d.ts */
+
+type _ExpandingSVGRProps = {
+  title?: string
 }
 
-module.exports = { svgrOptions, fileLoaderOptions }
+declare module '*.svg' {
+  import React = require('react')
+  export const ReactComponent: React.FC<React.SVGProps<SVGSVGElement> & _ExpandingSVGRProps>
+  const url: string
+  export default url
+}
 ```
+
+`tsconfig.json`의 include 배열에 "types/*.d.ts"를 추가해줍니다.
+
 
 <br />
 
